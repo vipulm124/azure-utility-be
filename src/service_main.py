@@ -3,10 +3,11 @@ from endpoints.service_endpoints import GET_ALL_RESOURCE_GROUPS
 from common.utilities import AZURE_TOKEN_URL, RESPONSE_AUTHENTICATION_FAILED_MESSAGE, RESPONSE_AUTHENTICATION_FAILED_STATUS_CODE, AZURE_RESOURCE_GROUPS_URL, RESPONSE_RESOURCEGROUP_FAILED_MESSAGE, AZURE_RESOURCE_BY_GROUP_NAME_URL, RESPONSE_RESOURCE_BY_GROUP_NAME_FAILED_MESSAGE, AZURE_RESOURCE_BY_ID, RESPONSE_RESOURCE_BY_ID_FAILED_MESSAGE, RESPONSE_DELETE_RESOURCE_BY_ID_FAILED_MESSAGE, AZURE_DELETE_RESOURCE_GROUP_URL, RESPONSE_RESOURCEGROUP_DELETE_FAILED_MESSAGE
 import requests
 import os
+from dotenv import load_dotenv
 
 
 app  = FastAPI()
-
+load_dotenv()
 
 
 async def get_token():
@@ -20,6 +21,7 @@ async def get_token():
         'client_secret': client_secret,
         'scope': scope
     }
+    print(payload)
   
   
     # Check if the request was successful
@@ -41,7 +43,9 @@ def allresourcegroups(access_token = Depends(get_token)):
         headers = {
             'Authorization' : f'Bearer {access_token}'
         }
+        print(AZURE_RESOURCE_GROUPS_URL)
         response = requests.get(url=AZURE_RESOURCE_GROUPS_URL, headers=headers)
+        print(response)
         if response.status_code == 200:
             return response.json()
         else:

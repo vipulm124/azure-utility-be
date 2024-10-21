@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 TENANT_ID = os.getenv('TENANT_ID')
 SUBSCRIPTION_ID = os.getenv('SUBSCRIPTION_ID')
