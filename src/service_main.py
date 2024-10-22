@@ -34,6 +34,37 @@ async def get_token():
         return None
 
 
+@app.get('/api/resource_group_data')
+def get_all_resource_group_data(access_token = Depends(get_token)):
+    response_items = []
+    if access_token is None:
+        return HTTPException(status_code=RESPONSE_AUTHENTICATION_FAILED_STATUS_CODE, detail=RESPONSE_AUTHENTICATION_FAILED_MESSAGE)
+    else:
+        headers = {
+            'Authorization' : f'Bearer {access_token}'
+        }
+       
+        response = requests.get(url=AZURE_RESOURCE_GROUPS_URL, headers=headers)
+        if response.status_code == 200:
+            response_json = response.json()
+            print(response_json)
+            for res in response_json['value']:
+                print(res['name'])
+                resource_group_name = res['name']
+                url = AZURE_RESOURCE_BY_GROUP_NAME_URL.replace('resourceGroupName', resource_group_name)
+                resource_group_response = requests.get(url=url, headers=headers)
+                if resource_group_response.status_code == 200:
+                    resource_group_items =  resource_group_response.json()['value']
+                    res['items'] = resource_group_items
+                    response_items.append(res)
+                else:
+                    return HTTPException(status_code=response.status_code, detail=RESPONSE_RESOURCE_BY_GROUP_NAME_FAILED_MESSAGE)
+        else:
+            return HTTPException(status_code=response.status_code, detail=RESPONSE_RESOURCEGROUP_FAILED_MESSAGE)
+    
+    return response_items
+
+
 
 @app.get('/api/get_all_resource_groups')
 def allresourcegroups(access_token = Depends(get_token)):
